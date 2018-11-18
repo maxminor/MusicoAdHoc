@@ -12,7 +12,7 @@ def setNewSong():
         adhocListener.addSong(request.form['song'])
 
         broadcastMessage = 'ADD ' + request.form['song']
-        udpSender.sendUDPPacket(10.42.0.255, 5000, broadcastMessage)
+        udpSender.sendUDPPacket('10.42.0.255', 5000, broadcastMessage)
         return jsonify({'message':'song has been added'})
 
 @app.route('/gettop')
