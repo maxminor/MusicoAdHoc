@@ -1,9 +1,23 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import _thread
 from adhoc import UDPAdHoc
+import udpSender
 
 adhocListener = UDPAdHoc(ip="0.0.0.0", port=5000)
 app = Flask(__name__)
+
+@app.route('/song',methods=['POST'])
+def setNewSong():
+    if request.method == 'POST':
+        adhocListener.addSong(request.form['song'])
+
+        broadcastMessage = 'ADD ' + request.form['song']
+        udpSender.sendUDPPacket(10.42.0.255, 5000, broadcastMessage)
+        return jsonify({'message':'song has been added'})
+
+@app.route('/gettop')
+def getTop3Music():
+    return jsonify(adhocListener.getTopMusic(3))
 
 @app.route("/")
 def hello():

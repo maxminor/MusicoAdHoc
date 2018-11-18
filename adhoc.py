@@ -1,4 +1,8 @@
 import socket 
+import json
+
+import udpSender
+import heapq
 
 # UDP_IP = "0.0.0.0"
 # UDP_PORT = 5000
@@ -33,7 +37,14 @@ class UDPAdHoc:
                     self.song_data[str(cleaned_data)] += 1
                 else:
                     self.song_data[str(cleaned_data)] = 1
-                for song in self.song_data.keys():
-                    print("{}: {}".format(str(song), self.song_data[song]))
+                # for song in self.song_data.keys():
+                #     print("{}: {}".format(str(song), self.song_data[song]))
 
-    def getTopMusic()
+    def addSong(self, song: str):
+        if song in self.song_data:
+            self.song_data[song] += 1
+        else:
+            self.song_data[song] = 1
+
+    def getTopMusic(self, NoOfTopSongs: int):
+        return heapq.nlargest(NoOfTopSongs,self.song_data.items(),lambda x: x[1])
