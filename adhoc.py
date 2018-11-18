@@ -4,6 +4,8 @@ import json
 import udpSender
 import heapq
 
+import udpSender
+
 # UDP_IP = "0.0.0.0"
 # UDP_PORT = 5000
 # sock = socket.socket(socket.AF_INET, # Internet
@@ -12,7 +14,10 @@ import heapq
 
 # song_data = {}
 
-
+#LIST OF COMMANDS
+#ADD: add new song to data
+#LST: request for new song_data
+#SLS: return from LST
 class UDPAdHoc:
     def __init__(self, ip, port):
         self.UDP_IP = ip
@@ -33,11 +38,18 @@ class UDPAdHoc:
             else: 
                 cleaned_data = data.decode('utf-8').strip()
                 print("received message:", cleaned_data)
-                if cleaned_data.split()[0] not in ['ADD','LIST']:
+                command = cleaned_data[0:2]
+                if command == 'ADD':
                     if cleaned_data in self.song_data:
                         self.song_data[str(cleaned_data)] += 1
                     else:
                         self.song_data[str(cleaned_data)] = 1
+                elif command == 'LST' and addr != socket.gethostbyname():
+                    udpSender.sendUDPPacket(addr, 5000, json.dump(self.song_data).encode('utf-8'))
+                elif cleaned_data.split()[0] == 'SLS':
+                    newdata = cleaned_data[4:]
+                    self.data = json.loads(newdata)
+
                 # for song in self.song_data.keys():
                 #     print("{}: {}".format(str(song), self.song_data[song]))
 
