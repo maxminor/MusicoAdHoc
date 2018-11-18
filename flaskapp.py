@@ -9,11 +9,11 @@ app = Flask(__name__)
 @app.route('/song',methods=['POST'])
 def setNewSong():
     if request.method == 'POST':
-        adhocListener.addSong(request.form['song'])
+        # adhocListener.addSong(request.form['song'])
 
         broadcastMessage = 'ADD ' + request.form['song']
         udpSender.sendUDPPacket('10.42.0.255', 5000, broadcastMessage)
-        return jsonify({'message':'song has been added'})
+        return jsonify({'message':'song has been broadcasted'})
 
 @app.route('/gettop')
 def getTop3Music():
