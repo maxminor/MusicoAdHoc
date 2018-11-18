@@ -33,10 +33,11 @@ class UDPAdHoc:
             else: 
                 cleaned_data = data.decode('utf-8').strip()
                 print("received message:", cleaned_data)
-                if cleaned_data in self.song_data:
-                    self.song_data[str(cleaned_data)] += 1
-                else:
-                    self.song_data[str(cleaned_data)] = 1
+                if cleaned_data.split()[0] not in ['ADD','LIST']:
+                    if cleaned_data in self.song_data:
+                        self.song_data[str(cleaned_data)] += 1
+                    else:
+                        self.song_data[str(cleaned_data)] = 1
                 # for song in self.song_data.keys():
                 #     print("{}: {}".format(str(song), self.song_data[song]))
 
