@@ -24,6 +24,17 @@ def setNewSong():
 def getTop3Music():
     return jsonify(adhocListener.getTopMusic(3))
 
+@app.route('/network', methods=['GET', 'POST'])
+def networks():
+	if request.method == 'GET':
+		return adhocListener.network_name
+	elif request.method == 'POST':
+		adhocListener.network_name = request.form['network_name']
+
+		return 'network has been created'
+
+
+
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
