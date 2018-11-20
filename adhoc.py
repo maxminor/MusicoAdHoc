@@ -65,13 +65,13 @@ class UDPAdHoc:
                         print('sending new list...')
                         newdata = {'network_name': self.network_name, 'song_data': self.song_data}
                         payload = 'SLS ' + json.dumps(newdata)
-                        # print(addr[0])
+                        print(payload)
                         udpSender.sendUDPPacket(str(addr[0]), 5000, payload)
 
                         
                 elif command == 'SLS':
                     print(self.network_name)
-                    if(addr != self.get_interface_ip() and self.network_name == ''):
+                    if(addr != self.get_interface_ip()):
                         received_payload = cleaned_data[4:]
                         print('payload is: ', received_payload)
                         try:
@@ -107,7 +107,7 @@ class UDPAdHoc:
 
     def stopCountdown(self):
         self.waiting_for_SLS_response = False
-        self.waiting_start_time = 0
+        # self.waiting_start_time = 0
     
     def countdown(self):
         while True:
@@ -120,6 +120,7 @@ class UDPAdHoc:
                 else:
                     continue
             else:
+                print('countdown stopped')
                 break
     
     def get_interface_ip(self):
