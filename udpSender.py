@@ -17,7 +17,7 @@ import time
 # print "UDP target port:", UDP_PORT
 # print "message:", MESSAGE
 
-def sendUDPPacket(ip, port, message):
+def sendUDPPacket(ip: str, port: int, message: str):
 
     print('sending {message} to ip:{ip}, port:{port}'.format(**vars()))
     cs = socket(AF_INET, SOCK_DGRAM)
