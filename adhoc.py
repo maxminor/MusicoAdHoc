@@ -4,6 +4,7 @@ import time
 
 import udpSender
 import heapq
+import netifaces as ni
 
 import udpSender
 
@@ -60,7 +61,7 @@ class UDPAdHoc:
                 elif command == 'LST':
                     print(addr[0])
                     print(self.network_name)
-                    if (addr[0] != socket.gethostbyname(socket.gethostname()) and self.network_name != ''):
+                    if (addr[0] != get_interface_ip()) and self.network_name != ''):
                         print('sending new list...')
                         newdata = {'network_name': self.network_name, 'song_data': self.song_data}
                         payload = 'SLS ' + json.dumps(newdata)
@@ -70,7 +71,7 @@ class UDPAdHoc:
                         
                 elif command == 'SLS':
                     print(self.network_name)
-                    if(addr != socket.gethostbyname(socket.gethostname()) and self.network_name == ''):
+                    if(addr != get_interface_ip()) and self.network_name == ''):
                         received_payload = cleaned_data[4:]
                         print('payload is: ', received_payload)
                         try:
@@ -111,10 +112,15 @@ class UDPAdHoc:
     def countdown(self):
         while True:
             if(self.waiting_for_SLS_response == True):
-                if((int(time.time()) - self.waiting_start_time) > 3):
+                if((int(time.time()) - self.waiting_start_time) > 10):
                     self.resetData()
                     print('song and network data has been reset')
                     self.stopCountdown()
                     break
+                else:
+                    continue
             else:
                 break
+    
+    def get_interface_ip(self):
+        return str(ni.ifaddresses(ni.interfaces()[-1])[ni.AF_INET][0]['addr'])
