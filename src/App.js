@@ -15,21 +15,24 @@ class App extends Component {
   }
 
   componentWillMount(){
-    let playing_list = ['https://www.youtube.com/watch?v=y906Cldzg-4','https://www.youtube.com/watch?v=27kOE0ndy28']
-    let playing_array = []
-    let currentPlay = null
-    for(let i =0;i<playing_list.length;i++){
-      let play_video = playing_list[i].split("v=")
-      if(playing_list[i].includes('youtube')&&play_video.length == 2){
-        if(!currentPlay){
-          currentPlay = play_video[1]
+    axios.get('/gettop')
+    .then(res=>{
+      let playing_list = res
+      let playing_array = []
+      let currentPlay = null
+      for(let i =0;i<playing_list.length;i++){
+        let play_video = playing_list[i].split("v=")
+        if(playing_list[i].includes('youtube')&&play_video.length == 2){
+          if(!currentPlay){
+            currentPlay = play_video[1]
+          }
+          playing_array.push(playing_list[i])
         }
-        playing_array.push(playing_list[i])
       }
-    }
-    this.setState({
-      playlist:playing_array,
-      playing:currentPlay
+      this.setState({
+        playlist:playing_array,
+        playing:currentPlay
+      })
     })
   }
 
