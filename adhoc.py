@@ -39,13 +39,15 @@ class UDPAdHoc:
             else: 
                 cleaned_data = data.decode('utf-8').strip()
                 print("received message:", cleaned_data)
-                command = cleaned_data[0:2]
+                command = cleaned_data[0:3]
+                print(command)
                 if command == 'ADD':
                     new_song = cleaned_data[4:]
+                    print(new_song)
                     if new_song in self.song_data.keys():
-                        self.song_data[str(cleaned_data)] += 1
+                        self.song_data[str(new_song)] += 1
                     else:
-                        self.song_data[str(cleaned_data)] = 1
+                        self.song_data[str(new_song)] = 1
                 elif command == 'LST':
                     if (addr != socket.gethostbyname() and self.network_name != ''):
                         newdata = {'network_name': self.network_name, 'song_data': self.song_data}
