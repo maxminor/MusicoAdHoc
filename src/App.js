@@ -37,7 +37,19 @@ class App extends Component {
 
   componentWillMount(){
     this.updatePlaylist()
+    if(!this.state.reload){
+      axios.post('/lst')
+      .then(()=>{
+        this.updatePlaylist()
+      })
+      .then(()=>{
+        this.setState({
+          reload:true
+        })
+      })
+    }
   }
+
 
   UNSAFE_componentWillUpdate(nextProps, nextState){
     console.log(nextState)
