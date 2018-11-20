@@ -20,6 +20,7 @@ import udpSender
 #SLS: return from LST
 class UDPAdHoc:
     def __init__(self, ip, port):
+        self.network_name = ''
         self.UDP_IP = ip
         self.UDP_PORT = port
         self.sock = socket.socket(socket.AF_INET, # Internet
@@ -40,15 +41,21 @@ class UDPAdHoc:
                 print("received message:", cleaned_data)
                 command = cleaned_data[0:2]
                 if command == 'ADD':
-                    if cleaned_data in self.song_data:
+                    new_song = cleaned_data[4:]
+                    if new_song in self.song_data.keys():
                         self.song_data[str(cleaned_data)] += 1
                     else:
                         self.song_data[str(cleaned_data)] = 1
-                elif command == 'LST' and addr != socket.gethostbyname():
-                    udpSender.sendUDPPacket(addr, 5000, json.dump(self.song_data).encode('utf-8'))
+                elif command == 'LST':
+                    if (addr != socket.gethostbyname() and self.network_name != ''):
+                        newdata = {'network_name': self.network_name, 'song_data': self.song_data}
+                        payload = 'SLS' + json.dumps(newdata)
+                        udpSender.sendUDPPacket(addr, 5000, payload.encode('utf-8'))
                 elif cleaned_data.split()[0] == 'SLS':
-                    newdata = cleaned_data[4:]
-                    self.data = json.loads(newdata)
+                    received_payload = cleaned_data[4:]
+                    newdict = json.loads(received_payload)
+                    self.network_name = newdict['network_name']
+                    self.data = newdict['song_data']
 
                 # for song in self.song_data.keys():
                 #     print("{}: {}".format(str(song), self.song_data[song]))
