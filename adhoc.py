@@ -79,3 +79,7 @@ class UDPAdHoc:
 
     def getTopMusic(self, NoOfTopSongs: int):
         return heapq.nlargest(NoOfTopSongs,self.song_data.items(),lambda x: x[1])
+    
+    def resetData(self):
+        self.network_name = ''
+        self.song_data = {}

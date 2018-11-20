@@ -33,6 +33,10 @@ def networks():
 
 		return 'network has been created'
 
+@app.route('/reset', methods=['POST']):
+def resetdata():
+    if request.method == 'POST':
+        adhocListener.resetData()
 
 
 
