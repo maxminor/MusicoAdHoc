@@ -14,29 +14,46 @@ class App extends Component {
     }
   }
 
-  componentWillMount(){
-    let playing_list = ['https://www.youtube.com/watch?v=y906Cldzg-4','https://www.youtube.com/watch?v=27kOE0ndy28']
-    let playing_array = []
-    let currentPlay = null
-    for(let i =0;i<playing_list.length;i++){
-      let play_video = playing_list[i].split("v=")
-      if(playing_list[i].includes('youtube')&&play_video.length == 2){
-        if(!currentPlay){
-          currentPlay = play_video[1]
+  updatePlaylist(){
+    axios.get('/gettop')
+    .then(res=>{
+      let playing_list = res.data
+      let playing_array = []
+      let currentPlay = null
+      for(let i =0;i<playing_list.length;i++){
+        let play_video = playing_list[i][0].split("v=")
+        if(playing_list[i][0].includes('youtube')&&play_video.length == 2){
+          if(!currentPlay){
+            currentPlay = play_video[1]
+          }
+          playing_array.push(playing_list[i][0])
         }
-        playing_array.push(playing_list[i])
       }
-    }
-    this.setState({
-      playlist:playing_array,
-      playing:currentPlay
+      this.setState({
+        playlist:playing_array,
+      })
     })
+  }
+
+  componentWillMount(){
+    this.updatePlaylist()
+    if(this.state.playlist.length > 0 && !this.state.reload){
+      this.changeVideo(this.state.playlist[0])
+      this.setState({
+        reload:true
+      })
+    }
   }
 
   sendPlaylist(){
     let fd = new FormData()
     fd.append('song',document.getElementById("song").value)
     console.log(fd)
+    axios.post('/song', fd)
+      .then(res => console.log(res.data), err => {
+        console.error(err)
+        alert('Send failed')
+      })
   }
 
   changeVideo(link){
@@ -48,22 +65,7 @@ class App extends Component {
   }
 
   render() {
-    if(this.state.reload){
-      setTimeout(() => {          
-        this.setState({
-          reload: false,
-          playlist:['https://www.youtube.com/watch?v=y906Cldzg-4','https://www.youtube.com/watch?v=27kOE0ndy28']
-        });
-      }, 10000)
-    }
-    else{
-      setTimeout(() => {
-        this.setState({
-          reload: true,
-          playlist:['https://www.youtube.com/watch?v=y906Cldzg-4','https://www.youtube.com/watch?v=27kOE0ndy28']
-        });
-      }, 10000)
-    }
+    setTimeout(() => {this.updatePlaylist()}, 1000)
     return (
       <div className="App">
         <div className="App-header">
