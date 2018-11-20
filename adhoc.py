@@ -108,6 +108,7 @@ class UDPAdHoc:
     
     def countdown(self):
         while True:
+            # print('lol')
             if(self.waiting_for_SLS_response == True):
                 if((int(time.time()) - self.waiting_start_time) > 3):
                     self.resetData()

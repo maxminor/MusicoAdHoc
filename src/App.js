@@ -3,6 +3,7 @@ import logo from './logo.svg';
 import './App.css';
 import axios from 'axios';
 import YouTube from 'react-youtube';
+import Modal from 'react-responsive-modal';
 
 class App extends Component {
   constructor(props){
@@ -10,7 +11,9 @@ class App extends Component {
     this.state = {
       reload:false,
       playlist:[],
-      playing:null
+      playing:null,
+      open:false,
+      modalText:""
     }
   }
 
@@ -36,17 +39,23 @@ class App extends Component {
   }
 
   componentWillMount(){
-    this.updatePlaylist()
+    if(!this.state.reload){
+      axios.post('/lst')
+      .then(()=>{
+        this.updatePlaylist()
+      })
+      .then(()=>{
+        this.setState({
+          reload:true
+        })
+      })
+    }
   }
 
   UNSAFE_componentWillUpdate(nextProps, nextState){
     console.log(nextState)
     if(nextState.playlist.length > 0 && nextState.reload === false){
-      console.log('hi')
       this.changeVideo(nextState.playlist[0])
-      this.setState({
-        reload:true
-      })
     }
   }
 
@@ -59,6 +68,31 @@ class App extends Component {
         console.error(err)
         alert('Send failed')
       })
+  }
+
+  checkNetwork(){
+    axios.get('/network')
+      .then(res => {
+        // console.log(res)
+        if(res.data == ''){
+          this.setState({
+            open:true,
+            modalText:'You are not connect to the ad-hoc network'
+          })
+        }
+        else{
+          this.setState({
+            open:true,
+            modalText:'You are connect to '+res.data+' ad-hoc network'
+          })
+        }
+      })
+  }
+
+  onClose(){
+    this.setState({
+      open:false
+    })
   }
 
   changeVideo(link){
@@ -98,14 +132,28 @@ class App extends Component {
             id="song"
             placeholder="youtube url"
           />
-          <button 
-            className="App-button"
-            // type="submit"
-            // value="submit"
-            onClick={()=>this.sendPlaylist()}
-          >
-            send link
-          </button>
+          <div>
+            <button 
+              className="App-button"
+              style={{backgroundColor:'blue'}}
+              // type="submit"
+              // value="submit"
+              onClick={()=>this.checkNetwork()}
+            >
+              check
+            </button>
+            <button 
+              className="App-button"
+              // type="submit"
+              // value="submit"
+              onClick={()=>this.sendPlaylist()}
+            >
+              send link
+            </button>
+          </div>
+          <Modal open={this.state.open} onClose={()=>this.onClose()} center>
+            <h2>{this.state.modalText}</h2>
+          </Modal>
         </div>
       </div>
     );
