@@ -33,10 +33,18 @@ def networks():
 
 		return 'network has been created'
 
-@app.route('/reset', methods=['POST']):
+@app.route('/reset', methods=['POST'])
 def resetdata():
     if request.method == 'POST':
         adhocListener.resetData()
+        return 'data has been reset'
+
+@app.route('/lst', methods=['POST'])
+def sendLST():
+    if request.method == 'POST':
+        adhocListener.requestSLS()
+        _thread.start_new_thread(adhocListener.countdown, tuple())
+        return 'SLS message has been sent'
 
 
 

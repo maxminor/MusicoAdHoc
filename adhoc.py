@@ -1,5 +1,6 @@
 import socket 
 import json
+import time
 
 import udpSender
 import heapq
@@ -18,6 +19,8 @@ import udpSender
 #ADD: add new song to data
 #LST: request for new song_data
 #SLS: return from LST
+
+import struct
 class UDPAdHoc:
     def __init__(self, ip, port):
         self.network_name = ''
@@ -26,8 +29,14 @@ class UDPAdHoc:
         self.sock = socket.socket(socket.AF_INET, # Internet
         socket.SOCK_DGRAM) # UDP
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        # timeval = struct.pack('ll',1,0)
+        # self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVTIMEO, timeval)
 
         self.song_data = {}
+
+        self.waiting_for_SLS_response = False
+        self.waiting_start_time = 0
+        
 
     def listenUDP(self):
         self.sock.bind((self.UDP_IP, self.UDP_PORT))
@@ -55,11 +64,13 @@ class UDPAdHoc:
                         payload = 'SLS ' + json.dumps(newdata)
                         # print(addr[0])
                         udpSender.sendUDPPacket(str(addr[0]), 5000, payload)
+
+                        
                 elif command == 'SLS':
                     print(self.network_name)
                     if(addr != socket.gethostbyname(socket.gethostname()) and self.network_name == ''):
                         received_payload = cleaned_data[4:]
-                        # print('payload is: ', received_payload)
+                        print('payload is: ', received_payload)
                         try:
                             newdict = json.loads(received_payload)
                             print(newdict)
@@ -67,6 +78,7 @@ class UDPAdHoc:
                             print(e)
                         self.network_name = newdict['network_name']
                         self.song_data = newdict['song_data']
+                        self.stopCountdown()
 
                 # for song in self.song_data.keys():
                 #     print("{}: {}".format(str(song), self.song_data[song]))
@@ -83,3 +95,24 @@ class UDPAdHoc:
     def resetData(self):
         self.network_name = ''
         self.song_data = {}
+
+    def requestSLS(self):
+        udpSender.sendUDPPacket('10.42.0.255', 5000, 'LST')
+        self.waiting_for_SLS_response = True
+        self.waiting_start_time = int(time.time())
+        print('countdown has been started' , self.waiting_start_time)
+
+    def stopCountdown(self):
+        self.waiting_for_SLS_response = False
+        self.waiting_start_time = 0
+    
+    def countdown(self):
+        while True:
+            if(self.waiting_for_SLS_response == True):
+                if((int(time.time()) - self.waiting_start_time) > 3):
+                    self.resetData()
+                    print('song and network data has been reset')
+                    self.stopCountdown()
+                    break
+            else:
+                break
