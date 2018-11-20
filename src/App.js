@@ -22,7 +22,7 @@ class App extends Component {
       let currentPlay = null
       for(let i =0;i<playing_list.length;i++){
         let play_video = playing_list[i][0].split("v=")
-        if(playing_list[i][0].includes('youtube')&&play_video.length == 2){
+        if(playing_list[i][0].includes('youtube')&& play_video.length === 2){
           if(!currentPlay){
             currentPlay = play_video[1]
           }
@@ -37,8 +37,13 @@ class App extends Component {
 
   componentWillMount(){
     this.updatePlaylist()
-    if(this.state.playlist.length > 0 && !this.state.reload){
-      this.changeVideo(this.state.playlist[0])
+  }
+
+  UNSAFE_componentWillUpdate(nextProps, nextState){
+    console.log(nextState)
+    if(nextState.playlist.length > 0 && nextState.reload === false){
+      console.log('hi')
+      this.changeVideo(nextState.playlist[0])
       this.setState({
         reload:true
       })
