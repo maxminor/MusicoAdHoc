@@ -51,7 +51,7 @@ def sendLST():
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve(path):
-    print(path)
+    # print(path)
     if path != "" and os.path.exists("build/" + path):
         return send_from_directory('build', path)
     else:

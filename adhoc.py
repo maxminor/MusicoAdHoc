@@ -23,7 +23,7 @@ import udpSender
 import struct
 class UDPAdHoc:
     def __init__(self, ip, port):
-        self.network_name = ''
+        self.network_name = 'network1'
         self.UDP_IP = ip
         self.UDP_PORT = port
         self.sock = socket.socket(socket.AF_INET, # Internet
@@ -58,8 +58,10 @@ class UDPAdHoc:
                     else:
                         self.song_data[str(new_song)] = 1
                 elif command == 'LST':
-                    if (addr != socket.gethostbyname(socket.gethostname()) and self.network_name != ''):
-                        # print('sending new list...')
+                    print(addr[0])
+                    print(self.network_name)
+                    if (addr[0] != socket.gethostbyname(socket.gethostname()) and self.network_name != ''):
+                        print('sending new list...')
                         newdata = {'network_name': self.network_name, 'song_data': self.song_data}
                         payload = 'SLS ' + json.dumps(newdata)
                         # print(addr[0])
