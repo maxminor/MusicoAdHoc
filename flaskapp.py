@@ -3,8 +3,11 @@ import os
 import _thread
 from adhoc import UDPAdHoc
 import udpSender
+import netifaces as ni
 
-adhocListener = UDPAdHoc(ip="0.0.0.0", port=5000)
+#THE HACKKKKKSSS
+ssid = os.popen('iwconfig ' + ni.interfaces()[-1] + " | grep 'ESSID'" ).read().split()[-1][7:-1]
+adhocListener = UDPAdHoc(network_name=ssid, ip="0.0.0.0", port=5000)
 app = Flask(__name__, static_folder='build')
 
 

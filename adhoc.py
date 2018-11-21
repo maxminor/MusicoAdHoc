@@ -1,6 +1,7 @@
 import socket 
 import json
 import time
+import os
 
 import udpSender
 import heapq
@@ -23,8 +24,8 @@ import udpSender
 
 import struct
 class UDPAdHoc:
-    def __init__(self, ip, port):
-        self.network_name = 'network1'
+    def __init__(self,network_name, ip, port):
+        self.network_name = network_name
         self.UDP_IP = ip
         self.UDP_PORT = port
         self.sock = socket.socket(socket.AF_INET, # Internet
