@@ -70,18 +70,30 @@ class UDPAdHoc:
                     #sender not in received_sequence_numbers
                     #if it has, sequence number must be more than current seq number
                     if ((self.isOwnIP(addr[0]) == False) and (payload['sender'] not in self.received_sequence_numbers.keys()) ):
-                        if(payload['sequence_number'] > self.received_sequence_numbers[payload['sender']]):
-                            self.addSong(str(payload['song']))
-                            self.received_sequence_numbers[payload['sender']] = int(payload['sequence_number'])
-                            #broadcast to other ips
-                            #retrieve sender broadcast addr
-                            #assume subnet is 24 bit
-                            # senderBroadcastAddr = addr[0].split('.').pop().append('255').join('.')
-                            # AdHocinterfaces = self.getAdHocIntefaces()
-                            for intf in self.getAdHocIntefaces():
-                                broadcastIP = self.getInterfaceBroadcastAddresses(intf)
-                                if(broadcastIP != senderBroadcastAddr):
-                                    udpSender.sendUDPPacket(str(broadcastIP), 5000, cleaned_data)
+                        # if(payload['sequence_number'] > self.received_sequence_numbers[payload['sender']]):
+                        self.addSong(str(payload['song']))
+                        self.received_sequence_numbers[payload['sender']] = int(payload['sequence_number'])
+                        #broadcast to other ips
+                        #retrieve sender broadcast addr
+                        #assume subnet is 24 bit
+                        # senderBroadcastAddr = addr[0].split('.').pop().append('255').join('.')
+                        # AdHocinterfaces = self.getAdHocIntefaces()
+                        for intf in self.getAdHocIntefaces():
+                            broadcastIP = self.getInterfaceBroadcastAddresses(intf)
+                            if(broadcastIP != senderBroadcastAddr):
+                                udpSender.sendUDPPacket(str(broadcastIP), 5000, cleaned_data)
+                    elif(payload['sequence_number'] > self.received_sequence_numbers[payload['sender']]):
+                        self.addSong(str(payload['song']))
+                        self.received_sequence_numbers[payload['sender']] = int(payload['sequence_number'])
+                        #broadcast to other ips
+                        #retrieve sender broadcast addr
+                        #assume subnet is 24 bit
+                        # senderBroadcastAddr = addr[0].split('.').pop().append('255').join('.')
+                        # AdHocinterfaces = self.getAdHocIntefaces()
+                        for intf in self.getAdHocIntefaces():
+                            broadcastIP = self.getInterfaceBroadcastAddresses(intf)
+                            if(broadcastIP != senderBroadcastAddr):
+                                udpSender.sendUDPPacket(str(broadcastIP), 5000, cleaned_data)
                     else:
                         print('ADD message rejected')
 
