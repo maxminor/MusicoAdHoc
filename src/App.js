@@ -9,7 +9,8 @@ class App extends Component {
     super(props)
     this.state = {
       reload:false,
-      playlist:[],
+      playlist:["www.youtube.com/watch?v=gEPmA3USJdI","www.youtube.com/watch?v=gEPmA3USJdI","www.youtube.com/watch?v=gEPmA3USJdI"],
+      totalPlaylist:["www.youtube.com/watch?v=gEPmA3USJdI","www.youtube.com/watch?v=gEPmA3USJdI","www.youtube.com/watch?v=gEPmA3USJdI"],
       playing:null
     }
   }
@@ -85,16 +86,20 @@ class App extends Component {
     setTimeout(() => {this.updatePlaylist()}, 1000)
     return (
       <div className="App">
-        <div className="App-header">
-          <h3>Musico Playlist</h3>
-          <YouTube
-            videoId={this.state.playing}
-            opts={{
-              height:'360',
-              width:'640'
-            }}
-          />
-          <div style={{margin:'0.5vw'}}>
+        <div className="Playlist">
+          <div style={{flex:1}}>
+            <h2 className="PlaylistHeader">Total Playlist</h2>
+            {this.state.totalPlaylist.map(link=>
+              <p  
+                className="App-link"
+                onClick={()=>this.changeVideo(link)}
+              >
+                {link}
+              </p>)
+            }
+          </div>
+          <div style={{flex:1}}>
+            <h2 className="PlaylistHeader"> Playlist</h2>
             {this.state.playlist.map(link=>
               <p  
                 className="App-link"
@@ -104,6 +109,16 @@ class App extends Component {
               </p>)
             }
           </div>
+        </div>
+        <div className="App-header">
+          <h3>Musico Playlist</h3>
+          <YouTube
+            videoId={this.state.playing}
+            opts={{
+              height:'360',
+              width:'640'
+            }}
+          />
           <input
             className="App-textarea"
             type='text'
