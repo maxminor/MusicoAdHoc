@@ -4,11 +4,17 @@ import _thread
 from adhoc import UDPAdHoc
 import udpSender
 import netifaces as ni
+import socket
+import json
+
 
 #THE HACKKKKKSSS
+#TODO: fix ssid get
 ssid = os.popen('iwconfig ' + ni.interfaces()[-1] + " | grep 'ESSID'" ).read().split()[-1][7:-1]
 adhocListener = UDPAdHoc(network_name=ssid, ip="0.0.0.0", port=5000)
 app = Flask(__name__, static_folder='build')
+
+
 
 
 @app.route('/song', methods=['GET', 'POST'])
@@ -17,10 +23,11 @@ def setNewSong():
         return jsonify(adhocListener.song_data)
     elif request.method == 'POST':
         # adhocListener.addSong(request.form['song'])
-
-        broadcastMessage = 'ADD ' + request.form['song']
+        messageDict = {'sequence_number': adhocListener.add_sequence_count, 'sender': socket.gethostname(), 'song': request.form['song']}
+        broadcastMessage = 'ADD ' + json.dumps(messageDict)
         udpSender.sendUDPPacket('10.42.0.255', 5000, broadcastMessage)
-        return jsonify({'message': 'song has been broadcasted'})
+        adhocListener.add_sequence_count += 1
+        return jsonify({'message': 'song has been broadcasted', 'output': messageDict})
 
 
 @app.route('/gettop')

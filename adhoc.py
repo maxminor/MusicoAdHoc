@@ -2,6 +2,7 @@ import socket
 import json
 import time
 import os
+import pprint
 
 import udpSender
 import heapq
@@ -31,8 +32,14 @@ class UDPAdHoc:
         self.sock = socket.socket(socket.AF_INET, # Internet
         socket.SOCK_DGRAM) # UDP
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        # timeval = struct.pack('ll',1,0)
-        # self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVTIMEO, timeval)
+
+        # self.adHocinterfaces = self.getAdHocIntefaces()
+
+        #dict that store latest sequence if for each senders for ADD command
+        # format {'sendername': number}
+        self.received_sequence_numbers = {}
+
+        self.add_sequence_count = 0
 
         self.song_data = {}
 
@@ -45,6 +52,9 @@ class UDPAdHoc:
         print('start listening UDP on port:', self.UDP_PORT)
         while True:
             data, addr = self.sock.recvfrom(1024) # buffer size is 1024 bytes
+            temp = addr[0].split('.')[:-1]
+            temp.append('255')
+            senderBroadcastAddr = '.'.join(temp)
             if not data:
                 continue
             else: 
@@ -53,16 +63,33 @@ class UDPAdHoc:
                 command = cleaned_data[0:3]
                 # print(command)
                 if command == 'ADD':
-                    new_song = cleaned_data[4:]
-                    print(new_song)
-                    if new_song in self.song_data.keys():
-                        self.song_data[str(new_song)] += 1
+                    payload = json.loads(cleaned_data[4:])
+                    pp = pprint.PrettyPrinter(indent=4)
+                    pp.pprint(payload)
+                    #not your own ip
+                    #sender not in received_sequence_numbers
+                    #if it has, sequence number must be more than current seq number
+                    if ((self.isOwnIP(addr[0]) == False) and (payload['sender'] not in self.received_sequence_numbers.keys()) ):
+                        if(payload['sequence_number'] > self.received_sequence_numbers[payload['sender']]):
+                            self.addSong(str(payload['song']))
+                            self.received_sequence_numbers[payload['sender']] = int(payload['sequence_number'])
+                            #broadcast to other ips
+                            #retrieve sender broadcast addr
+                            #assume subnet is 24 bit
+                            # senderBroadcastAddr = addr[0].split('.').pop().append('255').join('.')
+                            # AdHocinterfaces = self.getAdHocIntefaces()
+                            for intf in self.getAdHocIntefaces():
+                                broadcastIP = self.getInterfaceBroadcastAddresses(intf)
+                                if(broadcastIP != senderBroadcastAddr):
+                                    udpSender.sendUDPPacket(str(broadcastIP), 5000, cleaned_data)
                     else:
-                        self.song_data[str(new_song)] = 1
+                        print('ADD message rejected')
+
+
                 elif command == 'LST':
                     print(addr[0])
                     print(self.network_name)
-                    if (addr[0] != self.get_interface_ip() and self.network_name != ''):
+                    if ((self.isOwnIP() == False) and self.network_name != ''):
                         print('sending new list...')
                         newdata = {'network_name': self.network_name, 'song_data': self.song_data}
                         payload = 'SLS ' + json.dumps(newdata)
@@ -72,7 +99,7 @@ class UDPAdHoc:
                         
                 elif command == 'SLS':
                     print(self.network_name)
-                    if(addr != self.get_interface_ip()):
+                    if((self.isOwnIP() == False)):
                         received_payload = cleaned_data[4:]
                         print('payload is: ', received_payload)
                         try:
@@ -88,7 +115,7 @@ class UDPAdHoc:
                 #     print("{}: {}".format(str(song), self.song_data[song]))
 
     def addSong(self, song: str):
-        if song in self.song_data:
+        if song in self.song_data.keys():
             self.song_data[song] += 1
         else:
             self.song_data[song] = 1
@@ -123,6 +150,25 @@ class UDPAdHoc:
             else:
                 print('countdown stopped')
                 break
+
+    def getAdHocIntefaces(self):
+        interfaces = ni.interfaces()
+        ahintf = []
+        for intf in interfaces:
+            if(intf[0:2] == 'wl'):
+                command = 'iwconfig ' + intf + " | grep 'Mode:'"
+                if (os.popen(command).read().strip().split()[0].split(':')[1] == 'Ad-Hoc'):
+                    ahintf.append(intf)
+        return ahintf
     
-    def get_interface_ip(self):
-        return str(ni.ifaddresses(ni.interfaces()[-1])[ni.AF_INET][0]['addr'])
+    def getInterfaceBroadcastAddresses(self, intf: str):
+        return str(ni.ifaddresses(intf)[ni.AF_INET][0]['broadcast'])
+    
+    def isOwnIP(self, addr: str):
+        for intf in self.getAdHocIntefaces():
+            if(addr == self.get_interface_ip(intf)):
+                return True
+        return False
+
+    def get_interface_ip(self, intf: str):
+        return str(ni.ifaddresses(intf)[ni.AF_INET][0]['addr'])
