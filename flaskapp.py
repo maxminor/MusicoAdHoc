@@ -6,11 +6,16 @@ import udpSender
 import netifaces as ni
 import socket
 import json
+import sys
 
 
 #THE HACKKKKKSSS
 #TODO: fix ssid get
-ssid = os.popen('iwconfig ' + ni.interfaces()[-1] + " | grep 'ESSID'" ).read().split()[-1][7:-1]
+# ssid = os.popen('iwconfig ' + ni.interfaces()[-1] + " | grep 'ESSID'" ).read().split()[-1][7:-1]
+if(len(sys.argv) < 2):
+    raise Exception('Please enter network name')
+ssid = sys.argv[1]
+print('network name is:', ssid)
 adhocListener = UDPAdHoc(network_name=ssid, ip="0.0.0.0", port=5000)
 app = Flask(__name__, static_folder='build')
 
