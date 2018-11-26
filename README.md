@@ -7,4 +7,4 @@
 - `pipenv install`
 - `pipenv shell`
 - `npm install`
-- `npm run start-server`
+- `npm run start-server (netowrk name)`
