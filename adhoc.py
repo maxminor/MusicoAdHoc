@@ -70,11 +70,11 @@ class UDPAdHoc:
                     #sender not in received_sequence_numbers
                     #if it has, sequence number must be more than current seq number
                     if(self.isOwnIP(addr[0]) == True):
-                        print('ADD message rejected')
+                        print('ADD message rejected, your own message')
                         continue
                     elif(payload['sender'] in self.received_sequence_numbers.keys()):
-                        if(payload['sequence_number'] < self.received_sequence_numbers[payload['sender']]):
-                            print('Add message rejected')
+                        if(payload['sequence_number'] <= self.received_sequence_numbers[payload['sender']]):
+                            print('Add message rejected, old seq number')
                             continue
 
                     #broadcast to other ips
@@ -82,6 +82,8 @@ class UDPAdHoc:
                     #assume subnet is 24 bit
                     # senderBroadcastAddr = addr[0].split('.').pop().append('255').join('.')
                     # AdHocinterfaces = self.getAdHocIntefaces()
+                    print('message is not rejected, sending...')
+                    self.addSong(payload['song'])
                     for intf in self.getAdHocIntefaces():
                         broadcastIP = self.getInterfaceBroadcastAddresses(intf)
                         if(broadcastIP != senderBroadcastAddr):
