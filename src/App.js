@@ -9,8 +9,7 @@ class App extends Component {
     super(props)
     this.state = {
       reload:false,
-      playlist:["www.youtube.com/watch?v=gEPmA3USJdI","www.youtube.com/watch?v=gEPmA3USJdI","www.youtube.com/watch?v=gEPmA3USJdI"],
-      totalPlaylist:["www.youtube.com/watch?v=gEPmA3USJdI","www.youtube.com/watch?v=gEPmA3USJdI","www.youtube.com/watch?v=gEPmA3USJdI"],
+      playlist:[],
       playing:null
     }
   }
@@ -65,6 +64,8 @@ class App extends Component {
 
   sendPlaylist(){
     let fd = new FormData()
+    let play = this.state.playlist
+
     fd.append('song',document.getElementById("song").value)
     console.log(fd)
     axios.post('/song', fd)
@@ -83,21 +84,10 @@ class App extends Component {
   }
 
   render() {
-    setTimeout(() => {this.updatePlaylist()}, 1000)
+    // setTimeout(() => {this.updatePlaylist()}, 1000)
     return (
       <div className="App">
         <div className="Playlist">
-          <div style={{flex:1}}>
-            <h2 className="PlaylistHeader">Total Playlist</h2>
-            {this.state.totalPlaylist.map(link=>
-              <p  
-                className="App-link"
-                onClick={()=>this.changeVideo(link)}
-              >
-                {link}
-              </p>)
-            }
-          </div>
           <div style={{flex:1}}>
             <h2 className="PlaylistHeader"> Playlist</h2>
             {this.state.playlist.map(link=>
