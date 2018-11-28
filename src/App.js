@@ -84,7 +84,7 @@ class App extends Component {
   }
 
   render() {
-    // setTimeout(() => {this.updatePlaylist()}, 1000)
+    setTimeout(() => {this.updatePlaylist()}, 1000)
     return (
       <div className="App">
         <div className="Playlist">
