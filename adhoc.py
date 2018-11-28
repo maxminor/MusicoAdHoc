@@ -93,7 +93,7 @@ class UDPAdHoc:
                 elif command == 'LST':
                     print(addr[0])
                     print(self.network_name)
-                    if ((self.isOwnIP() == False) and self.network_name != ''):
+                    if ((self.isOwnIP(addr[0]) == False) and self.network_name != ''):
                         print('sending new list...')
                         newdata = {'network_name': self.network_name, 'song_data': self.song_data}
                         payload = 'SLS ' + json.dumps(newdata)
@@ -103,7 +103,7 @@ class UDPAdHoc:
                         
                 elif command == 'SLS':
                     print(self.network_name)
-                    if((self.isOwnIP() == False)):
+                    if((self.isOwnIP(addr[0]) == False)):
                         received_payload = cleaned_data[4:]
                         print('payload is: ', received_payload)
                         try:
