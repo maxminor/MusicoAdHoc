@@ -58,8 +58,8 @@ def resetdata():
 def sendLST():
     if request.method == 'POST':
         adhocListener.requestSLS()
-        _thread.start_new_thread(adhocListener.countdown, tuple())
-        return 'SLS message has been sent'
+        # _thread.start_new_thread(adhocListener.countdown, tuple())
+        return 'LST message has been sent'
 
 
 

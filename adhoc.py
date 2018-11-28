@@ -132,28 +132,31 @@ class UDPAdHoc:
         self.song_data = {}
 
     def requestSLS(self):
-        udpSender.sendUDPPacket('10.42.0.255', 5000, 'LST')
-        self.waiting_for_SLS_response = True
-        self.waiting_start_time = int(time.time())
-        print('countdown has been started' , self.waiting_start_time)
+        adhocintf = self.getAdHocIntefaces()
+        for intf in adhocintf:
+            udpSender.sendUDPPacket(intf, 5000, 'LST')
+        # udpSender.sendUDPPacket('10.42.0.255', 5000, 'LST')
+        # self.waiting_for_SLS_response = True
+        # self.waiting_start_time = int(time.time())
+        # print('countdown has been started' , self.waiting_start_time)
 
     def stopCountdown(self):
         self.waiting_for_SLS_response = False
         # self.waiting_start_time = 0
     
-    def countdown(self):
-        while True:
-            if(self.waiting_for_SLS_response == True):
-                if((int(time.time()) - self.waiting_start_time) > 10):
-                    self.resetData()
-                    print('song and network data has been reset')
-                    self.stopCountdown()
-                    break
-                else:
-                    continue
-            else:
-                print('countdown stopped')
-                break
+    # def countdown(self):
+    #     while True:
+    #         if(self.waiting_for_SLS_response == True):
+    #             if((int(time.time()) - self.waiting_start_time) > 10):
+    #                 self.resetData()
+    #                 print('song and network data has been reset')
+    #                 self.stopCountdown()
+    #                 break
+    #             else:
+    #                 continue
+    #         else:
+    #             print('countdown stopped')
+    #             break
 
     def getAdHocIntefaces(self):
         interfaces = ni.interfaces()
