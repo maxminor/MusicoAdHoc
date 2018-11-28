@@ -27,7 +27,7 @@ def setNewSong():
     if request.method == 'GET':
         return jsonify(adhocListener.song_data)
     elif request.method == 'POST':
-        # adhocListener.addSong(request.form['song'])
+        adhocListener.addSong(request.form['song'])
         messageDict = {'sequence_number': adhocListener.add_sequence_count, 'sender': socket.gethostname(), 'song': request.form['song']}
         broadcastMessage = 'ADD ' + json.dumps(messageDict)
         udpSender.sendUDPPacket('10.42.0.255', 5000, broadcastMessage)
