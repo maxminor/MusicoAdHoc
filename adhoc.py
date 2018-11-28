@@ -134,7 +134,8 @@ class UDPAdHoc:
     def requestSLS(self):
         adhocintf = self.getAdHocIntefaces()
         for intf in adhocintf:
-            udpSender.sendUDPPacket(intf, 5000, 'LST')
+            print('sending lst to ', self.getInterfaceBroadcastAddresses(intf))
+            udpSender.sendUDPPacket(self.getInterfaceBroadcastAddresses(intf), 5000, 'LST')
         # udpSender.sendUDPPacket('10.42.0.255', 5000, 'LST')
         # self.waiting_for_SLS_response = True
         # self.waiting_start_time = int(time.time())
